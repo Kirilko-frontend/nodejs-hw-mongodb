@@ -3,6 +3,7 @@ import cors from 'cors';
 import pino from 'pino-http';
 import dotenv from 'dotenv';
 import contactsRouter from './routes/contactsRouter.js';
+import contactRouterId from './routes/contactRouterId.js';
 dotenv.config();
 
 export function setupServer() {
@@ -13,6 +14,7 @@ export function setupServer() {
   app.use(express.json());
 
   app.use(contactsRouter);
+  app.use(contactRouterId);
 
   app.use((req, res) => {
     res.status(404).json({ status: 404, message: 'Not found' });
