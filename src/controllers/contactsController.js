@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { getAllContacts, getContactId } from '../services/contacts.js';
 
 export async function getAllContactsController(req, res, next) {
@@ -9,9 +10,9 @@ export async function getAllContactsController(req, res, next) {
       data: contacts,
     });
   } catch (error) {
-    res.status(404).json({
-      status: 404,
-      message: 'Contacts not found',
+    res.status(500).json({
+      status: 500,
+      message: 'Failed to get contacts',
     });
     next(error);
   }
@@ -19,12 +20,16 @@ export async function getAllContactsController(req, res, next) {
 
 export async function getContactIdController(req, res, next) {
   try {
-    const contact = await getContactId(req.params.id);
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ message: 'Contact not found' });
+    }
+
+    const contact = await getContactId(id);
 
     if (!contact) {
-      return res.status(404).json({
-        message: 'Contact not found',
-      });
+      return res.status(404).json({ message: 'Contact not found' });
     }
 
     res.status(200).json({
