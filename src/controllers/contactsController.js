@@ -19,18 +19,20 @@ export async function getAllContactsController(req, res, next) {
 
 export async function getContactIdController(req, res, next) {
   try {
-    const contactId = await getContactId(req.params.id);
+    const contact = await getContactId(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({
+        message: 'Contact not found',
+      });
+    }
+
     res.status(200).json({
       status: 200,
       message: 'Successfully found contact!',
-      data: contactId,
+      data: contact,
     });
   } catch (error) {
-    res.status(404).json({
-      status: 404,
-      message: 'Contact not found',
-    });
-
     next(error);
   }
 }
