@@ -3,6 +3,8 @@ import cors from 'cors';
 import pino from 'pino-http';
 import dotenv from 'dotenv';
 import contactsRouter from './routes/contactsRouter.js';
+import errorHandler from './middlewares/errorHandler.js';
+import notFoundHandler from './middlewares/notFoundHandler.js';
 dotenv.config();
 
 export function setupServer() {
@@ -14,9 +16,9 @@ export function setupServer() {
 
   app.use(contactsRouter);
 
-  app.use((req, res) => {
-    res.status(404).json({ status: 404, message: 'Not found' });
-  });
+  app.use(errorHandler);
+
+  app.use(notFoundHandler);
 
   const PORT = process.env.PORT || 3000;
 
