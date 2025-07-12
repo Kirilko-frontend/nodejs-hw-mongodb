@@ -14,7 +14,7 @@ export function setupServer() {
   app.use(pino());
   app.use(express.json());
 
-  app.use(contactsRouter);
+  app.use('/contacts', contactsRouter);
 
   app.use(errorHandler);
 
