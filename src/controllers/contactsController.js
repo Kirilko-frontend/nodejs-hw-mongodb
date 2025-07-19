@@ -17,17 +17,17 @@ export async function getAllContactsController(req, res) {
   });
 }
 
-export async function getContactIdController(req, res, next) {
+export async function getContactIdController(req, res) {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return next(createHttpError(400, 'Invalid contact ID format'));
+    throw createHttpError(400, 'Invalid contact ID format');
   }
 
   const contact = await getContactId(id);
 
   if (!contact) {
-    return next(createHttpError(404, 'Contact not found'));
+    throw createHttpError(404, 'Contact not found');
   }
 
   res.status(200).json({
@@ -37,15 +37,13 @@ export async function getContactIdController(req, res, next) {
   });
 }
 
-export async function createContactController(req, res, next) {
+export async function createContactController(req, res) {
   const { name, phoneNumber, contactType } = req.body;
 
   if (!name || !phoneNumber || !contactType) {
-    return next(
-      createHttpError(
-        400,
-        'Missing required fields: name, phoneNumber, or contactType',
-      ),
+    throw createHttpError(
+      400,
+      'Missing required fields: name, phoneNumber, or contactType',
     );
   }
 
@@ -57,22 +55,22 @@ export async function createContactController(req, res, next) {
   });
 }
 
-export async function patchContactController(req, res, next) {
+export async function patchContactController(req, res) {
   const { id } = req.params;
   const updateData = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return next(createHttpError(400, 'Invalid contact ID format'));
+    throw createHttpError(400, 'Invalid contact ID format');
   }
 
   if (Object.keys(updateData).length === 0) {
-    return next(createHttpError(400, 'Missing fields to update'));
+    throw createHttpError(400, 'Missing fields to update');
   }
 
   const updatedContact = await patchContact(id, updateData);
 
   if (!updatedContact) {
-    return next(createHttpError(404, 'Contact not found'));
+    throw createHttpError(404, 'Contact not found');
   }
 
   res.status(200).json({
@@ -82,17 +80,17 @@ export async function patchContactController(req, res, next) {
   });
 }
 
-export async function deleteContactController(req, res, next) {
+export async function deleteContactController(req, res) {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return next(createHttpError(400, 'Invalid contact ID format'));
+    throw createHttpError(400, 'Invalid contact ID format');
   }
 
   const deletedContact = await deleteContact(id);
 
   if (!deletedContact) {
-    return next(createHttpError(404, 'Contact not found'));
+    throw createHttpError(404, 'Contact not found');
   }
 
   res.status(204).send();
