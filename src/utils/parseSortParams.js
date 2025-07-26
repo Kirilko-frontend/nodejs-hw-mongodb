@@ -1,21 +1,21 @@
 function parsedSortByfunc(value) {
-  if (typeof value === 'undefined') {
+  if (value === undefined) {
     return '_id';
   }
 
   const keys = ['_id', 'name', 'contactType'];
 
-  if (keys.includes(value) != true) {
+  if (!keys.includes(value)) {
     return '_id';
   }
   return value;
 }
 
 function parsedSortOrderfunc(value) {
-  if (typeof value === 'undefined') {
+  if (value === undefined) {
     return 'asc';
   }
-  if (value != 'asc' && 'desc') {
+  if (value !== 'asc' && value !== 'desc') {
     return 'asc';
   }
   return value;

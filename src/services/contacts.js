@@ -13,10 +13,12 @@ export async function getAllContacts(page, perPage, sortBy, sortOrder, filter) {
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
+  const sortOrderNum = sortOrder === 'desc' ? -1 : 1;
+
   const [total, contacts] = await Promise.all([
     contactsQuery.clone().countDocuments(),
     contactsQuery
-      .sort({ [sortBy]: sortOrder })
+      .sort({ [sortBy]: sortOrderNum })
       .skip(skip)
       .limit(perPage),
   ]);

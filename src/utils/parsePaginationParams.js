@@ -1,9 +1,9 @@
 function parseNumber(value, defaultValue) {
-  if (typeof value === 'undefined') {
+  if (value === undefined) {
     return defaultValue;
   }
 
-  const parsedValue = parseInt(value);
+  const parsedValue = parseInt(value, 10);
 
   if (Number.isNaN(parsedValue) === true) {
     return defaultValue;

@@ -15,17 +15,19 @@ export async function getAllContactsController(req, res) {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
   const filter = parseFilterParams(req.query);
-  const contacts = await getAllContacts(
+
+  const contactsData = await getAllContacts(
     page,
     perPage,
     sortBy,
     sortOrder,
     filter,
   );
+
   res.status(200).json({
     status: 200,
     message: 'Successfully found contacts!',
-    data: contacts,
+    data: contactsData,
   });
 }
 
@@ -60,6 +62,7 @@ export async function createContactController(req, res) {
   }
 
   const contact = await createContact(req.body);
+
   res.status(201).json({
     status: 201,
     message: 'Successfully created a contact!',
