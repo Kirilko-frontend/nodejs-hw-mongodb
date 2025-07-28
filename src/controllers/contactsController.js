@@ -22,6 +22,7 @@ export async function getAllContactsController(req, res) {
     sortBy,
     sortOrder,
     filter,
+    req.user.id,
   );
 
   res.status(200).json({
@@ -38,7 +39,7 @@ export async function getContactIdController(req, res) {
     throw createHttpError(400, 'Invalid contact ID format');
   }
 
-  const contact = await getContactId(id);
+  const contact = await getContactId(id, req.user.id);
 
   if (!contact) {
     throw createHttpError(404, 'Contact not found');
@@ -61,7 +62,12 @@ export async function createContactController(req, res) {
     );
   }
 
-  const contact = await createContact(req.body);
+  const contactData = {
+    ...req.body,
+    userId: req.user.id,
+  };
+
+  const contact = await createContact(contactData);
 
   res.status(201).json({
     status: 201,
@@ -82,7 +88,7 @@ export async function patchContactController(req, res) {
     throw createHttpError(400, 'Missing fields to update');
   }
 
-  const updatedContact = await patchContact(id, updateData);
+  const updatedContact = await patchContact(id, updateData, req.user.id);
 
   if (!updatedContact) {
     throw createHttpError(404, 'Contact not found');
@@ -102,7 +108,7 @@ export async function deleteContactController(req, res) {
     throw createHttpError(400, 'Invalid contact ID format');
   }
 
-  const deletedContact = await deleteContact(id);
+  const deletedContact = await deleteContact(id, req.user.id);
 
   if (!deletedContact) {
     throw createHttpError(404, 'Contact not found');
