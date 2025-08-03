@@ -14,19 +14,18 @@ import { registerSchema, loginSchema } from '../validation/auth.js';
 const authRoute = express.Router();
 
 authRoute.post(
-  '/auth/register',
+  '/register',
   validateBody(registerSchema),
   ctrlWrapper(registerController),
 );
 
 authRoute.post(
-  '/auth/login',
+  '/login',
   validateBody(loginSchema),
   ctrlWrapper(loginController),
 );
 
-authRoute.post('/auth/logout', ctrlWrapper(logoutController));
-
-authRoute.post('/auth/refresh', ctrlWrapper(refreshController));
+authRoute.post('/logout', ctrlWrapper(logoutController));
+authRoute.post('/refresh', ctrlWrapper(refreshController));
 
 export default authRoute;
