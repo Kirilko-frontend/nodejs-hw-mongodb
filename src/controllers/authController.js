@@ -7,8 +7,7 @@ import {
 
 export async function registerController(req, res) {
   const user = await registerUser(req.body);
-  res.json({
-    status: 201,
+  res.status(201).json({
     message: 'Successfully registered a user!',
     data: user,
   });
@@ -27,8 +26,7 @@ export async function loginController(req, res) {
     expires: session.refreshTokenValidUntil,
   });
 
-  res.json({
-    status: 200,
+  res.status(200).json({
     message: 'Successfully logged in an user!',
     data: {
       accessToken: session.accessToken,
@@ -63,8 +61,7 @@ export async function refreshController(req, res) {
     expires: session.refreshTokenValidUntil,
   });
 
-  res.json({
-    status: 200,
+  res.status(200).json({
     message: 'Session refreshed',
     data: {
       accessToken: session.accessToken,

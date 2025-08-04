@@ -20,10 +20,11 @@ export function setupServer() {
   app.use(cookieParser());
 
   app.use('/auth', authRoute);
+
   app.use('/contacts', contactsRouter);
 
-  app.use(errorHandler);
   app.use(notFoundHandler);
+  app.use(errorHandler);
 
   const PORT = process.env.PORT || 3000;
 
