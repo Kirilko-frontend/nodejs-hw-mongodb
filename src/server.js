@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'node:path';
 import cors from 'cors';
 import pino from 'pino-http';
 import dotenv from 'dotenv';
@@ -18,6 +19,8 @@ export function setupServer() {
   app.use(pino());
   app.use(express.json());
   app.use(cookieParser());
+
+  app.use('/avatars', express.static(path.resolve('src/uploads/avatars')));
 
   app.use('/auth', authRoute);
 

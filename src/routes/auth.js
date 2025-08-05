@@ -8,8 +8,15 @@ import {
   loginController,
   logoutController,
   refreshController,
+  requestRessetPasswordController,
+  ressetPasswordController,
 } from '../controllers/authController.js';
-import { registerSchema, loginSchema } from '../validation/auth.js';
+import {
+  registerSchema,
+  loginSchema,
+  requestRessetPasswordSchema,
+  ressetPasswordSchema,
+} from '../validation/auth.js';
 
 const authRoute = express.Router();
 
@@ -26,6 +33,19 @@ authRoute.post(
 );
 
 authRoute.post('/logout', ctrlWrapper(logoutController));
+
 authRoute.post('/refresh', ctrlWrapper(refreshController));
+
+authRoute.post(
+  '/send-reset-email',
+  validateBody(requestRessetPasswordSchema),
+  ctrlWrapper(requestRessetPasswordController),
+);
+
+authRoute.post(
+  '/reset-pwd',
+  validateBody(ressetPasswordSchema),
+  ctrlWrapper(ressetPasswordController),
+);
 
 export default authRoute;

@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import * as fs from 'node:fs/promises';
+import path from 'node:path';
 import createHttpError from 'http-errors';
 import {
   getAllContacts,
@@ -10,6 +12,8 @@ import {
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
+import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
+import { getEnvVariable } from '../utils/getEnvVariable.js';
 
 export async function getAllContactsController(req, res) {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -53,6 +57,26 @@ export async function getContactIdController(req, res) {
 }
 
 export async function createContactController(req, res) {
+  let photo = null;
+
+  if (getEnvVariable('UPLOAD_TO_CLOUDINARY') === true) {
+    const result = await uploadToCloudinary(req.file.path);
+    await fs.unlink(req.file.path);
+
+    photo = result.secure_url;
+  } else {
+    await fs.rename(
+      req.filer.path,
+      path.resolve('src/uploads/photo', req.file.filename),
+    );
+    photo = `http://localhost:3000/photo/${req.file.filename}`;
+  }
+
+  const contact = await createContact({
+    id,
+    photo,
+    userId: req.user.id,
+  });
   const { name, phoneNumber, contactType } = req.body;
 
   if (!name || !phoneNumber || !contactType) {
@@ -61,13 +85,6 @@ export async function createContactController(req, res) {
       'Missing required fields: name, phoneNumber, or contactType',
     );
   }
-
-  const contactData = {
-    ...req.body,
-    userId: req.user.id,
-  };
-
-  const contact = await createContact(contactData);
 
   res.status(201).json({
     status: 201,
@@ -80,6 +97,21 @@ export async function patchContactController(req, res) {
   const { id } = req.params;
   const updateData = req.body;
 
+  let photo = null;
+
+  if (getEnvVariable('UPLOAD_TO_CLOUDINARY') === true) {
+    const result = await uploadToCloudinary(req.file.path);
+    await fs.unlink(req.file.path);
+
+    photo = result.secure_url;
+  } else {
+    await fs.rename(
+      req.filer.path,
+      path.resolve('src/uploads/photo', req.file.filename),
+    );
+    photo = `http://localhost:3000/photo/${req.file.filename}`;
+  }
+
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw createHttpError(400, 'Invalid contact ID format');
   }
@@ -88,7 +120,12 @@ export async function patchContactController(req, res) {
     throw createHttpError(400, 'Missing fields to update');
   }
 
-  const updatedContact = await patchContact(id, updateData, req.user.id);
+  const updatedContact = await patchContact({
+    id,
+    photo,
+    updateData,
+    userId: req.user.id,
+  });
 
   if (!updatedContact) {
     throw createHttpError(404, 'Contact not found');
