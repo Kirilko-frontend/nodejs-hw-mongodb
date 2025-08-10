@@ -26,7 +26,7 @@ contactsRouter.get('/:id', isValidId, ctrlWrapper(getContactIdController));
 
 contactsRouter.post(
   '/',
-  upload.single('avatar'),
+  upload.single('photo'),
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );

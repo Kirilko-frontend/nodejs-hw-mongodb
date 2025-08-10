@@ -17,6 +17,22 @@ import { getEnvVariable } from '../utils/getEnvVariable.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
+async function handleFileUpload(file) {
+  if (!file) return null;
+
+  if (getEnvVariable('UPLOAD_TO_CLOUDINARY') === 'true') {
+    const result = await uploadToCloudinary(file.path);
+    await fs.unlink(file.path);
+    return result.secure_url;
+  } else {
+    await fs.rename(
+      file.path,
+      path.resolve('src/uploads/photo', file.filename),
+    );
+    return `http://localhost:3000/photo/${file.filename}`;
+  }
+}
+
 export async function getAllContactsController(req, res) {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
@@ -59,34 +75,23 @@ export async function getContactIdController(req, res) {
 }
 
 export async function createContactController(req, res) {
-  let photo = null;
-
-  if (getEnvVariable('UPLOAD_TO_CLOUDINARY') === true) {
-    const result = await uploadToCloudinary(req.file.path);
-    await fs.unlink(req.file.path);
-
-    photo = result.secure_url;
-  } else {
-    await fs.rename(
-      req.filer.path,
-      path.resolve('src/uploads/photo', req.file.filename),
-    );
-    photo = `http://localhost:3000/photo/${req.file.filename}`;
-  }
-
-  const contact = await createContact({
-    id,
-    photo,
-    userId: req.user.id,
-  });
   const { name, phoneNumber, contactType } = req.body;
-
   if (!name || !phoneNumber || !contactType) {
     throw createHttpError(
       400,
       'Missing required fields: name, phoneNumber, or contactType',
     );
   }
+
+  const photo = await handleFileUpload(req.file);
+
+  const contact = await createContact({
+    name,
+    phoneNumber,
+    contactType,
+    photo,
+    userId: req.user.id,
+  });
 
   res.status(201).json({
     status: 201,
@@ -97,37 +102,23 @@ export async function createContactController(req, res) {
 
 export async function patchContactController(req, res) {
   const { id } = req.params;
-  const updateData = req.body;
-
-  let photo = null;
-
-  if (getEnvVariable('UPLOAD_TO_CLOUDINARY') === true) {
-    const result = await uploadToCloudinary(req.file.path);
-    await fs.unlink(req.file.path);
-
-    photo = result.secure_url;
-  } else {
-    await fs.rename(
-      req.filer.path,
-      path.resolve('src/uploads/photo', req.file.filename),
-    );
-    photo = `http://localhost:3000/photo/${req.file.filename}`;
-  }
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw createHttpError(400, 'Invalid contact ID format');
   }
 
-  if (Object.keys(updateData).length === 0) {
+  const updateData = req.body;
+
+  if (Object.keys(updateData).length === 0 && !req.file) {
     throw createHttpError(400, 'Missing fields to update');
   }
 
-  const updatedContact = await patchContact({
-    id,
-    photo,
-    updateData,
-    userId: req.user.id,
-  });
+  const photo = await handleFileUpload(req.file);
+
+  const updateFields = { ...updateData };
+  if (photo) updateFields.photo = photo;
+
+  const updatedContact = await patchContact(id, updateFields, req.user.id);
 
   if (!updatedContact) {
     throw createHttpError(404, 'Contact not found');
@@ -153,5 +144,9 @@ export async function deleteContactController(req, res) {
     throw createHttpError(404, 'Contact not found');
   }
 
-  res.status(204).send();
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully deleted contact!',
+    data: deletedContact,
+  });
 }
