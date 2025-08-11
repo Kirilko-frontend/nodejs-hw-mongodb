@@ -75,11 +75,11 @@ export async function getContactIdController(req, res) {
 }
 
 export async function createContactController(req, res) {
-  const { name, phoneNumber, contactType } = req.body;
-  if (!name || !phoneNumber || !contactType) {
+  const { name, phoneNumber, contactType, email, isFavourite } = req.body;
+  if (!name || !phoneNumber || !contactType || !email) {
     throw createHttpError(
       400,
-      'Missing required fields: name, phoneNumber, or contactType',
+      'Missing required fields: name, phoneNumber, contactType, or email',
     );
   }
 
@@ -89,6 +89,8 @@ export async function createContactController(req, res) {
     name,
     phoneNumber,
     contactType,
+    email,
+    isFavourite,
     photo,
     userId: req.user.id,
   });
@@ -107,18 +109,21 @@ export async function patchContactController(req, res) {
     throw createHttpError(400, 'Invalid contact ID format');
   }
 
-  const updateData = req.body;
+  const updateData = { ...req.body };
+  if (updateData.isFavourite !== undefined) {
+    updateData.isFavourite = updateData.isFavourite === 'true';
+  }
 
   if (Object.keys(updateData).length === 0 && !req.file) {
     throw createHttpError(400, 'Missing fields to update');
   }
 
   const photo = await handleFileUpload(req.file);
+  if (photo) {
+    updateData.photo = photo;
+  }
 
-  const updateFields = { ...updateData };
-  if (photo) updateFields.photo = photo;
-
-  const updatedContact = await patchContact(id, updateFields, req.user.id);
+  const updatedContact = await patchContact(id, updateData, req.user.id);
 
   if (!updatedContact) {
     throw createHttpError(404, 'Contact not found');
