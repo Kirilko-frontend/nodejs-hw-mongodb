@@ -117,3 +117,22 @@ export async function ressetPassword(token, password) {
     console.log(error);
   }
 }
+
+export async function loginOrRegister(email, name) {
+  let user = await User.findOne({ email });
+
+  if (user === null) {
+    const password = await bcrypt.hash(
+      crypto.randomBytes(30).toString('base64'),
+      10,
+    );
+    user = await User.create({
+      name,
+      email,
+      password,
+    });
+  }
+  await Session.deleteOne({ userId: user._id });
+
+  return createSession(user._id);
+}

@@ -1,0 +1,55 @@
+type: object
+required:
+  - _id
+  - name
+  - phoneNumber
+  - email
+  - contactType
+  - userId
+  - photo
+  - createdAt
+  - updatedAt
+properties:
+  _id:
+    type: string
+    description: Contact id
+    example: 689c9e142695300ea8f5f58d
+  name:
+    type: string
+    description: Contact name
+    example: Dmytro Klemenko
+  phoneNumber:
+    type: string
+    description: Contact number
+    example: +380669872456
+  email:
+    type: string
+    description: Contact email
+    example: klemenko@gmail.com
+  isFavourite:
+    type: boolean
+    description: Contact is favourite
+    example: false
+    default: false
+  contactType:
+    type: string
+    description: Contact type
+    enum: ['work', 'home', 'personal']
+    default: 'personal'
+  userId:
+    type: string
+    description: Contact userId
+    example: 689c9faa0b9f29329b8f647b
+  photo:
+    type: string
+    description: Contact photo
+    default: null
+    example: https://res.cloudinary.com/dnnzagoko/image/upload/v1754974106/nygtx4x7…
+  createdAt:
+    type: string
+    format: date-time
+    example: 2025-07-27T09:21:59.643+00:00
+  updatedAt:
+    type: string
+    format: date-time
+    example: 2025-07-27T09:21:59.643+00:00

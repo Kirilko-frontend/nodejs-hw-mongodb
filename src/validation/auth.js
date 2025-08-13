@@ -19,3 +19,7 @@ export const ressetPasswordSchema = Joi.object({
   token: Joi.string().required(),
   password: Joi.string().required(),
 });
+
+export const confirmOauthSchema = Joi.object({
+  code: Joi.string().required(),
+});

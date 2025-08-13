@@ -10,12 +10,15 @@ import {
   refreshController,
   requestRessetPasswordController,
   ressetPasswordController,
+  getOauthController,
+  confirmOauthController,
 } from '../controllers/authController.js';
 import {
   registerSchema,
   loginSchema,
   requestRessetPasswordSchema,
   ressetPasswordSchema,
+  confirmOauthSchema,
 } from '../validation/auth.js';
 
 const authRoute = express.Router();
@@ -46,6 +49,14 @@ authRoute.post(
   '/reset-pwd',
   validateBody(ressetPasswordSchema),
   ctrlWrapper(ressetPasswordController),
+);
+
+authRoute.get('/get-oauth-url', ctrlWrapper(getOauthController));
+
+authRoute.post(
+  '/confirm-oauth',
+  validateBody(confirmOauthSchema),
+  ctrlWrapper(confirmOauthController),
 );
 
 export default authRoute;
