@@ -2,7 +2,7 @@ tags:
   - Contacts
 summary: Create contact
 operationId: createContact
-description: Create contact
+description: Create a new contact
 security:
   - bearerAuth: []
 requestBody:
@@ -34,14 +34,17 @@ requestBody:
             description: Contact type
             enum: ['work', 'home', 'personal']
             example: work
-            default: personal
           photo:
             type: string
-            description: contact photo
-            example: https://res.cloudinary.com/dnnzagoko/image/upload/v1754921581/eekctlet…
+            format: binary
+            description: Contact photo
+          isFavourite:
+            type: boolean
+            description: Mark contact as favourite
+            example: false
 responses:
   '201':
-    description: 'Created contact'
+    description: Created contact
     content:
       application/json:
         schema:

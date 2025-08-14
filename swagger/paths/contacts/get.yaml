@@ -71,9 +71,30 @@ responses:
               type: string
               example: Successfully found contacts!
             data:
-              type: array
-              items:
-                $ref: ../../components/schemas/contact.yaml
+              type: object
+              required:
+                - contacts
+                - page
+                - perPage
+                - totalItems
+                - totalPages
+              properties:
+                contacts:
+                  type: array
+                  items:
+                    $ref: ../../components/schemas/contact.yaml
+                page:
+                  type: integer
+                  example: 1
+                perPage:
+                  type: integer
+                  example: 10
+                totalItems:
+                  type: integer
+                  example: 42
+                totalPages:
+                  type: integer
+                  example: 5
   '401':
     $ref: ../../components/responses/401.yaml
   '500':

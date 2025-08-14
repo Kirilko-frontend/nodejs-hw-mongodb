@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:3000"
+      "url": "https://contacts-app-k65z.onrender.com"
     }
   ],
   "tags": [
@@ -435,9 +435,37 @@
                       "example": "Successfully found contacts!"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/contact"
+                      "type": "object",
+                      "required": [
+                        "contacts",
+                        "page",
+                        "perPage",
+                        "totalItems",
+                        "totalPages"
+                      ],
+                      "properties": {
+                        "contacts": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/contact"
+                          }
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "perPage": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "totalItems": {
+                          "type": "integer",
+                          "example": 42
+                        },
+                        "totalPages": {
+                          "type": "integer",
+                          "example": 5
+                        }
                       }
                     }
                   }
@@ -459,7 +487,7 @@
         ],
         "summary": "Create contact",
         "operationId": "createContact",
-        "description": "Create contact",
+        "description": "Create a new contact",
         "security": [
           {
             "bearerAuth": []
@@ -501,13 +529,17 @@
                       "home",
                       "personal"
                     ],
-                    "example": "work",
-                    "default": "personal"
+                    "example": "work"
                   },
                   "photo": {
                     "type": "string",
-                    "description": "contact photo",
-                    "example": "https://res.cloudinary.com/dnnzagoko/image/upload/v1754921581/eekctlet…"
+                    "format": "binary",
+                    "description": "Contact photo"
+                  },
+                  "isFavourite": {
+                    "type": "boolean",
+                    "description": "Mark contact as favourite",
+                    "example": false
                   }
                 }
               }
